@@ -28,6 +28,7 @@ public final class ClickTNT extends JavaPlugin implements Listener {
     public void onEnable() {
         // Plugin startup logic
         getLogger().info("クリックTNTプラグインが起動しました！");
+        // イベント登録（クリックしたときみたいなイベントを登録しないと、クリックした時に反応してくれない）
         getServer().getPluginManager().registerEvents(this,this);
     }
 
@@ -41,10 +42,15 @@ public final class ClickTNT extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onClick(PlayerInteractEvent e){
+        // プレイヤーが行ったアクション（行動）の情報を取得
         Action action = e.getAction();
+        // （空中を左クリック or ブロックを左クリック）and メインハンドでクリックしたとき（マイクラの仕様上メインハンドとオフハンドそれぞれでクリック判定が出るためこれをしないと２回実行される）
         if((action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) && e.getHand() == EquipmentSlot.HAND){
+            // プレイヤー情報を取得
             Player player = e.getPlayer();
+            // プレイヤー情報の中のプレイヤーの位置情報を取得
             Location loc = player.getLocation();
+            // world.spawnEntity()でTNTを生成（ワールドを複数同時に稼働させることがあるためworldのメソッドになっている）
             TNTPrimed tnt1 =  (TNTPrimed) loc.getWorld().spawnEntity(player.getEyeLocation(), EntityType.PRIMED_TNT);
             TNTPrimed tnt2 =  (TNTPrimed) loc.getWorld().spawnEntity(player.getEyeLocation(), EntityType.PRIMED_TNT);
             TNTPrimed tnt3 =  (TNTPrimed) loc.getWorld().spawnEntity(player.getEyeLocation(), EntityType.PRIMED_TNT);
