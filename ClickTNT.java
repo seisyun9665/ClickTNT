@@ -3,7 +3,6 @@ package syun.github.minecraft.plugin.clicktnt.clicktnt;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
@@ -54,22 +53,29 @@ public final class ClickTNT extends JavaPlugin implements Listener {
             TNTPrimed tnt1 =  (TNTPrimed) loc.getWorld().spawnEntity(player.getEyeLocation(), EntityType.PRIMED_TNT);
             TNTPrimed tnt2 =  (TNTPrimed) loc.getWorld().spawnEntity(player.getEyeLocation(), EntityType.PRIMED_TNT);
             TNTPrimed tnt3 =  (TNTPrimed) loc.getWorld().spawnEntity(player.getEyeLocation(), EntityType.PRIMED_TNT);
+            // ランダムな数字を生成するための準備
             Random random = new Random();
+            // ＴＮＴの起爆時間を設定（2秒＋α）
             tnt1.setFuseTicks(TNT_TICK + random.nextInt(20));
             tnt2.setFuseTicks(TNT_TICK + random.nextInt(20));
             tnt3.setFuseTicks(TNT_TICK + random.nextInt(20));
+            // tntの飛ぶ方向のベクトルを設定
             Vector vec1 = player.getLocation().getDirection().clone();
             Vector vec2 = player.getLocation().getDirection().clone();
             Vector vec3 = player.getLocation().getDirection().clone();
+            // それぞれのTNTをちょっとだけランダムな方向に飛ばす（setVelocityでベクトルを設定する。設定したベクトルの方向に移動する）
             tnt1.setVelocity(vec1.clone().add(Vector.getRandom().add(new Vector(-0.5,-0.5,-0.5)).multiply(0.1)).normalize().multiply(TNT_SPEED));
             tnt2.setVelocity(vec2.clone().add(Vector.getRandom().add(new Vector(-0.5,-0.5,-0.5)).multiply(0.1)).normalize().multiply(TNT_SPEED));
             tnt3.setVelocity(vec3.clone().add(Vector.getRandom().add(new Vector(-0.5,-0.5,-0.5)).multiply(0.1)).normalize().multiply(TNT_SPEED));
 
+            // ニワトリが死ぬ時の音を鳴らす
             loc.getWorld().playSound(loc, Sound.ENTITY_CHICKEN_DEATH,1,1);
+            // i tick（1 tick = 0.05秒）後に処理を実行する
             for(int i = 0; i < TNT_TICK;i++){
                 getServer().getScheduler().runTaskLater(this, new Runnable() {
                     @Override
                     public void run() {
+                        // TNTがある座標にエンドロッドのパーティクルを発生させる
                         tnt1.getLocation().getWorld().spawnParticle(Particle.END_ROD, tnt1.getLocation(), 10,0,0,0,0);
                         tnt2.getLocation().getWorld().spawnParticle(Particle.END_ROD, tnt2.getLocation(), 10,0,0,0,0);
                         tnt3.getLocation().getWorld().spawnParticle(Particle.END_ROD, tnt3.getLocation(), 10,0,0,0,0);
